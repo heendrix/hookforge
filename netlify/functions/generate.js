@@ -57,9 +57,9 @@ const data = await response.json();
 if (!response.ok) {
   console.log("API ERROR:", data);
   return {
-    statusCode: 500,
-    body: JSON.stringify({ error: "API failed" }),
-  };
+  statusCode: 500,
+  body: JSON.stringify(data),
+};
 }
     const raw = (data.content || []).map((i) => i.text || "").join("").trim();
     const clean = raw.replace(/```json|```/g, "").trim();
