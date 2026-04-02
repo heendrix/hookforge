@@ -37,25 +37,42 @@ Rules:
 Respond ONLY with valid JSON. No markdown, no backticks, no preamble.
 Format: {"hooks":[{"style":"The Pattern Interrupt","text":"..."},{"style":"The Bold Claim","text":"..."},{"style":"The Curiosity Gap","text":"..."},{"style":"The Contrarian Take","text":"..."},{"style":"The Relatable Pain","text":"..."},{"style":"The Data Hook","text":"..."},{"style":"The Story Open","text":"..."}]}`;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+   const response = await fetch("https://api.anthropic.com/v1/messages", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": process.env.ANTHROPIC_API_KEY,
+    "anthropic-version": "2023-06-01",
+  },
+  body: JSON.stringify({
+    model: "claude-3-haiku-20240307",
+    max_tokens: 1000,
+    messages: [{ role: "user", content: prompt }],
+  }),
+});
 
-    const data = await response.json();
+const data = await response.json();
+
+// VERY IMPORTANT
+if (!response.ok) {
+  console.log("API ERROR:", data);
+  return {
+    statusCode: 500,
+    body: JSON.stringify({ error: "API failed" }),
+  };
+}
     const raw = (data.content || []).map((i) => i.text || "").join("").trim();
     const clean = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(clean);
+    let parsed;
 
+try {
+  parsed = JSON.parse(clean);
+} catch (e) {
+  return {
+    statusCode: 500,
+    body: JSON.stringify({ error: "Bad AI response" }),
+  };
+}
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
