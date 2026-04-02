@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HookForge — AI Hook Generator for Creators</title>
+  <meta name="description" content="Generate 7 scroll-stopping hooks in seconds. Free AI tool for creators."/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #06000e;
+      --surface:    #0d0120;
+      --surface2:   #130228;
+      --border:     #1e0840;
+      --border2:    #2d1060;
+      --violet:     #7c3aed;
+      --violet-lt:  #a78bfa;
+      --violet-dim: rgba(124,58,237,0.12);
+      --violet-glow:rgba(124,58,237,0.25);
+      --text:       #f0ebff;
+      --muted:      #6b5f8a;
+      --subtle:     #2a1850;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* AMBIENT BACKGROUND */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(109,40,217,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(76,29,149,0.1) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* GRAIN */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* TOP SHIMMER BAR */
+    .shimmer-bar {
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, var(--violet) 30%, #c084fc 50%, var(--violet) 70%, transparent 100%);
+      background-size: 300% 100%;
+      animation: shimmer 3s linear infinite;
+      position: relative; z-index: 10;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 48px;
+      background: rgba(6,0,14,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 0.08em;
+      color: #fff;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .logo-dot {
+      width: 8px; height: 8px;
+      background: var(--violet);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--violet);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { box-shadow: 0 0 8px var(--violet); }
+      50%      { box-shadow: 0 0 20px var(--violet-lt); }
+    }
+
+    .nav-tag {
+      font-size: 10px;
+      color: var(--violet-lt);
+      border: 1px solid rgba(167,139,250,0.3);
+      background: rgba(167,139,250,0.06);
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.12em;
+    }
+
+    /* HERO */
+    .hero {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 110px 24px 90px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--violet-lt);
+      border: 1px solid rgba(167,139,250,0.25);
+      background: rgba(167,139,250,0.06);
+      padding: 6px 16px; border-radius: 30px;
+      margin-bottom: 36px;
+      animation: fadeDown 0.6s ease forwards;
+    }
+
+    .eyebrow-dot {
+      width: 5px; height: 5px;
+      background: var(--violet-lt);
+      border-radius: 50%;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 9vw, 100px);
+      line-height: 0.95;
+      letter-spacing: 0.03em;
+      color: #fff;
+      margin-bottom: 28px;
+      animation: fadeUp 0.7s ease 0.1s forwards; opacity: 0;
+    }
+
+    .hero h1 .accent {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--violet-lt);
+    }
+
+    .hero h1 .glow-word {
+      color: var(--violet-lt);
+      text-shadow: 0 0 40px rgba(167,139,250,0.5), 0 0 80px rgba(124,58,237,0.3);
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 420px;
+      margin: 0 auto 48px;
+      line-height: 1.8;
+      animation: fadeUp 0.7s ease 0.2s forwards; opacity: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-cta {
+      display: inline-block;
+      background: var(--violet);
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 16px 44px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 0 40px rgba(124,58,237,0.3), 0 4px 20px rgba(124,58,237,0.2);
+      animation: fadeUp 0.7s ease 0.3s forwards; opacity: 0;
+    }
+
+    .hero-cta:hover {
+      background: #6d28d9;
+      transform: translateY(-3px);
+      box-shadow: 0 0 60px rgba(124,58,237,0.45), 0 8px 30px rgba(124,58,237,0.3);
+    }
+
+    /* STATS */
+    .stats {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat {
+      text-align: center;
+      padding: 30px 44px;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+
+    .stat-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 34px;
+      color: var(--violet-lt);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(167,139,250,0.4);
+    }
+
+    .stat-lbl {
+      font-size: 10px; letter-spacing: 0.12em;
+      color: var(--muted); text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* MAIN TOOL */
+    .tool-wrap {
+      position: relative; z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 80px 24px 100px;
+    }
+
+    .section-eyebrow {
+      font-size: 10px; letter-spacing: 0.2em;
+      color: var(--muted); text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px; letter-spacing: 0.04em;
+      color: #fff; margin-bottom: 44px;
+    }
+
+    /* FORM CARD */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      margin-bottom: 24px;
+    }
+
+    .field { margin-bottom: 30px; }
+    .field:last-child { margin-bottom: 0; }
+
+    .field-label {
+      font-size: 10px; letter-spacing: 0.15em;
+      color: var(--muted); text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      padding: 16px 18px;
+      resize: none; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.7;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1), 0 0 20px rgba(124,58,237,0.05);
+    }
+
+    textarea::placeholder, input::placeholder { color: #3a2860; }
+
+    /* CHIPS */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .chip {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      color: var(--muted);
+      transition: all 0.15s;
+      user-select: none;
+      letter-spacing: 0.03em;
+    }
+
+    .chip:hover { border-color: rgba(167,139,250,0.3); color: #c4b5fd; }
+
+    .chip.on {
+      border-color: var(--violet);
+      color: var(--violet-lt);
+      background: var(--violet-dim);
+      box-shadow: 0 0 12px rgba(124,58,237,0.15);
+    }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 32px 0;
+    }
+
+    /* GENERATE BTN */
+    .gen-btn {
+      width: 100%;
+      background: var(--violet);
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 18px;
+      border-radius: 10px;
+      border: none; cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 30px rgba(124,58,237,0.25);
+    }
+
+    .gen-btn:hover:not(:disabled) {
+      background: #6d28d9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(124,58,237,0.4);
+    }
+
+    .gen-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* LOADING */
+    .loading {
+      text-align: center; padding: 60px 0;
+    }
+
+    .ld-dots { display: flex; justify-content: center; gap: 6px; }
+
+    .ld-dots span {
+      width: 9px; height: 9px;
+      background: var(--violet);
+      border-radius: 50%;
+      animation: ldBounce 1.3s infinite ease-in-out;
+      box-shadow: 0 0 10px var(--violet-glow);
+    }
+    .ld-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .ld-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes ldBounce {
+      0%,100% { transform: translateY(0); opacity: 0.4; }
+      50%      { transform: translateY(-10px); opacity: 1; }
+    }
+
+    .ld-label {
+      font-size: 12px; color: var(--muted);
+      letter-spacing: 0.1em; margin-top: 18px;
+    }
+
+    /* RESULTS */
+    .results-wrap { margin-top: 50px; }
+
+    .results-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .results-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: 0.06em; color: #fff;
+    }
+
+    .results-meta { font-size: 11px; color: var(--muted); }
+
+    /* HOOK CARDS */
+    .hook-card {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      animation: fadeUp 0.4s ease forwards;
+      opacity: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hook-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--violet);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .hook-card:hover {
+      border-color: rgba(124,58,237,0.5);
+      transform: translateX(5px);
+      box-shadow: -3px 0 0 var(--violet), 0 4px 30px rgba(124,58,237,0.08);
+    }
+
+    .hook-card:hover::before { opacity: 1; }
+
+    .hook-card:nth-child(1){animation-delay:0.04s}
+    .hook-card:nth-child(2){animation-delay:0.08s}
+    .hook-card:nth-child(3){animation-delay:0.12s}
+    .hook-card:nth-child(4){animation-delay:0.16s}
+    .hook-card:nth-child(5){animation-delay:0.20s}
+    .hook-card:nth-child(6){animation-delay:0.24s}
+    .hook-card:nth-child(7){animation-delay:0.28s}
+
+    .hook-top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .hook-badge {
+      font-size: 10px;
+      color: var(--violet-lt);
+      background: var(--violet-dim);
+      border: 1px solid rgba(167,139,250,0.2);
+      padding: 3px 10px; border-radius: 20px;
+      letter-spacing: 0.06em;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; padding: 5px 14px;
+      border-radius: 5px; cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover { border-color: var(--violet); color: var(--violet-lt); }
+    .copy-btn.ok { border-color: #16a34a; color: #4ade80; }
+
+    .hook-text {
+      font-size: 14px; line-height: 1.75;
+      color: #d4c8f0;
+    }
+
+    /* TIP BOX */
+    .tip-box {
+      margin-top: 16px;
+      padding: 16px 20px;
+      border: 1px dashed var(--border2);
+      border-radius: 10px;
+      font-size: 12px; color: var(--muted);
+      line-height: 1.7;
+      background: rgba(124,58,237,0.03);
+    }
+
+    .tip-box strong { color: #7c6aaa; }
+
+    /* ERROR */
+    .error-msg {
+      color: #f87171; font-size: 13px;
+      text-align: center; margin-top: 16px;
+    }
+
+    /* HOW IT WORKS */
+    .how-section {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 80px 24px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-top: 36px;
+    }
+
+    .step {
+      background: var(--surface);
+      padding: 28px 22px;
+      transition: background 0.2s;
+    }
+
+    .step:hover { background: var(--surface2); }
+
+    .step-n {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 44px; color: var(--violet);
+      opacity: 0.25; line-height: 1;
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    .step-t {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500; font-size: 13px;
+      color: #fff; margin-bottom: 8px;
+    }
+
+    .step-d { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 36px 24px;
+      font-size: 11px; color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    footer .ft-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px; letter-spacing: 0.1em;
+      color: var(--violet-lt);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      nav { padding: 14px 20px; }
+      .hero { padding: 70px 20px 60px; }
+      .stats { flex-wrap: wrap; }
+      .stat { flex: 1 1 50%; border-right: none; border-bottom: 1px solid var(--border); }
+      .form-card { padding: 24px 20px; }
+      .tool-wrap { padding: 50px 20px 70px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shimmer-bar"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    HOOKFORGE
+  </div>
+  <span class="nav-tag">FREE · AI POWERED</span>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="eyebrow-dot"></span>
+    Free Creator Tool
+  </div>
+  <h1>STOP LOSING<br><span class="accent">READERS</span><br>AT <span class="glow-word">LINE ONE</span></h1>
+  <p class="hero-sub">Generate 7 scroll-stopping hooks in seconds. The first line decides everything — make yours count.</p>
+  <a href="#tool" class="hero-cta">Generate Free Hooks →</a>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-val">7</div><div class="stat-lbl">Hook Styles</div></div>
+  <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Platforms</div></div>
+  <div class="stat"><div class="stat-val">&lt;10s</div><div class="stat-lbl">Generation</div></div>
+  <div class="stat"><div class="stat-val">FREE</div><div class="stat-lbl">No Signup</div></div>
+</div>
+
+<!-- TOOL -->
+<section class="tool-wrap" id="tool">
+  <div class="section-eyebrow">The Generator</div>
+  <div class="section-title">CRAFT YOUR HOOK</div>
+
+  <div class="form-card">
+    <div class="field">
+      <div class="field-label">Your Topic</div>
+      <textarea id="topicInput" rows="3" placeholder="e.g. Why most Web3 projects fail before they ever launch..."></textarea>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="field">
+      <div class="field-label">Platform</div>
+      <div class="chips" id="platformGroup">
+        <div class="chip on" data-g="platform">X (Twitter)</div>
+        <div class="chip" data-g="platform">LinkedIn</div>
+        <div class="chip" data-g="platform">Instagram</div>
+        <div class="chip" data-g="platform">Newsletter</div>
+        <div class="chip" data-g="platform">YouTube</div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="field">
+      <div class="field-label">Content Type</div>
+      <div class="chips" id="typeGroup">
+        <div class="chip on" data-g="type">Thread</div>
+        <div class="chip" data-g="type">Story</div>
+        <div class="chip" data-g="type">Opinion</div>
+        <div class="chip" data-g="type">Tutorial</div>
+        <div class="chip" data-g="type">Case Study</div>
+        <div class="chip" data-g="type">Hot Take</div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="field">
+      <div class="field-label">Tone</div>
+      <div class="chips" id="toneGroup">
+        <div class="chip on" data-g="tone">Bold & Aggressive</div>
+        <div class="chip" data-g="tone">Curious & Intriguing</div>
+        <div class="chip" data-g="tone">Data-Driven</div>
+        <div class="chip" data-g="tone">Personal & Vulnerable</div>
+        <div class="chip" data-g="tone">Contrarian</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="gen-btn" id="genBtn" onclick="generate()">
+    Generate 7 Hooks →
+  </button>
+
+  <div id="errMsg" class="error-msg" style="display:none;"></div>
+  <div id="output"></div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="how-section">
+    <div class="section-eyebrow">The Process</div>
+    <div class="section-title">HOW IT WORKS</div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-n">01</div>
+        <div class="step-t">Drop Your Topic</div>
+        <div class="step-d">Paste your subject or rough angle. Specific beats vague every time.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <div class="step-t">Set Context</div>
+        <div class="step-d">Choose your platform, format, and the tone that fits your voice.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <div class="step-t">Get 7 Hooks</div>
+        <div class="step-d">Each uses a different proven framework — curiosity, pain, data, story and more.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">04</div>
+        <div class="step-t">Copy & Post</div>
+        <div class="step-d">One click to copy. Test the hook that feels right and watch your reach grow.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">HOOKFORGE</div>
+  <p style="margin-top:10px;">Built for creators who take their craft seriously.</p>
+</footer>
+
+<script>
+  // Chip toggle
+  document.querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', () => {
+      const g = c.dataset.g;
+      document.querySelectorAll(`.chip[data-g="${g}"]`).forEach(x => x.classList.remove('on'));
+      c.classList.add('on');
+    });
+  });
+
+  function sel(g) {
+    return document.querySelector(`.chip.on[data-g="${g}"]`)?.textContent || '';
+  }
+
+  async function generate() {
+    const topic = document.getElementById('topicInput').value.trim();
+    if (!topic) return;
+
+    const platform    = sel('platform');
+    const contentType = sel('type');
+    const tone        = sel('tone');
+    const btn         = document.getElementById('genBtn');
+    const output      = document.getElementById('output');
+    const errMsg      = document.getElementById('errMsg');
+
+    btn.disabled = true;
+    btn.textContent = 'Forging hooks...';
+    errMsg.style.display = 'none';
+
+    output.innerHTML = `
+      <div class="results-wrap">
+        <div class="loading">
+          <div class="ld-dots"><span></span><span></span><span></span></div>
+          <div class="ld-label">Crafting your hooks...</div>
+        </div>
+      </div>`;
+
+    try {
+      const res = await fetch('/.netlify/functions/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic, platform, contentType, tone })
+      });
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      renderHooks(data.hooks, platform, contentType);
+
+    } catch (e) {
+      output.innerHTML = '';
+      errMsg.textContent = e.message || 'Something went wrong. Try again.';
+      errMsg.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Generate 7 Hooks →';
+    }
+  }
+
+  function renderHooks(hooks, platform, type) {
+    const cards = hooks.map((h, i) => `
+      <div class="hook-card">
+        <div class="hook-top">
+          <span class="hook-badge">${h.style}</span>
+          <button class="copy-btn" onclick="copyHook(this, \`${h.text.replace(/`/g,'\\`')}\`)">Copy</button>
+        </div>
+        <div class="hook-text">${h.text}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('output').innerHTML = `
+      <div class="results-wrap">
+        <div class="results-head">
+          <div class="results-title">7 HOOKS READY</div>
+          <div class="results-meta">${platform} · ${type}</div>
+        </div>
+        ${cards}
+        <div class="tip-box">
+          <strong>Pro tip —</strong> Hook #3 (Curiosity Gap) and #5 (Relatable Pain) consistently win. Test both before committing.
+        </div>
+      </div>`;
+
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function copyHook(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied';
+      btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 1800);
+    });
+  }
+
+  // Cmd+Enter shortcut
+  document.getElementById('topicInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) generate();
+  });
+</script>
+</body>
+</html>
